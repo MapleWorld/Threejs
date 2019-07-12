@@ -9,16 +9,11 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - point lights WebGL demo
-		</div>
 
 		<script type="module">
 
-			import * as THREE from './js/three.module.js';
-
+			import * as THREE from './build/three.module.js';
 			import Stats from './jsm/libs/stats.module.js';
-
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
 			var camera, scene, renderer, controls;
@@ -36,19 +31,16 @@
 				var container = document.getElementById( 'container' );
 
 				// CAMERA
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 300 );
 				camera.position.set( 0, 15, 150 );
 				camera.lookAt( 0, 0, 0 );
 
 				// SCENE
-
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x040306 );
 				scene.fog = new THREE.Fog( 0x040306, 10, 300 );
 
 				// TEXTURES
-
 				var textureLoader = new THREE.TextureLoader();
 
 				var texture = textureLoader.load( "textures/disturb.jpg" );
@@ -57,12 +49,10 @@
 				texture.format = THREE.RGBFormat;
 
 				// MATERIALS
-
 				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture } );
 				var objectMaterial = new THREE.MeshStandardMaterial( { color: 0xffffff, roughness: 0.5, metalness: 1.0 } );
 
 				// GROUND
-
 				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 800, 400, 2, 2 ), groundMaterial );
 				mesh.position.y = - 5;
 				mesh.rotation.x = - Math.PI / 2;
@@ -161,33 +151,22 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
-
 			}
 
 			function onWindowResize() {
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
-
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				controls.handleResize();
-
 			}
 
-			//
-
 			function animate() {
-
 				requestAnimationFrame( animate );
-
 				render();
 				stats.update();
-
 			}
 
 			function render() {
-
 				var time = Date.now() * 0.00025;
 				var d = 150;
 
@@ -212,7 +191,6 @@
 				controls.update( clock.getDelta() );
 
 				renderer.render( scene, camera );
-
 			}
 
 		</script>
