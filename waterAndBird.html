@@ -52,6 +52,7 @@
             import { CreateRenderer } from './js/renderer.js';
             import { Water } from './jsm/objects/Water.js';
             import { Sky } from './jsm/objects/Sky.js';
+            import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
 
             const NUMBER_OF_BIRDS = 3000;
             var mixers = [];
@@ -95,26 +96,22 @@
                 camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 5000 );
                 camera.position.set( 0, 0, 250 );
                 scene.background = new THREE.Color().setHSL( 0.6, 0, 1 );
-                //scene.fog = new THREE.Fog( scene.background, 1, 5000 );
 
                 dirLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
                 scene.add( dirLight );
 
-                // Ground
+
                 water = CreateWater(dirLight);
                 scene.add( water );
-                //scene.add(createGround());
 
                 for (let i = 0; i < NUMBER_OF_BIRDS; i ++ ) {
                     scene.add(randomizeObjectPosition(HeartShapeMesh()));
                 }
-
                 createBird();
 
 
                 // RENDERER
                 renderer = CreateRenderer(container);
-
 
                 // Sky
                 var sky = new Sky();
