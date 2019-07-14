@@ -33,7 +33,7 @@
 			animate();
 
 			function init() {
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 3000;
 				scene = new THREE.Scene();
 
@@ -44,14 +44,12 @@
 
 				// Renderer
 				renderer = new CSS3DRenderer();
+				//renderer = new THREE.WebGLRenderer({ antialias: true });
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.getElementById( 'container' ).appendChild( renderer.domElement );
 
 				// Control
 				controls = new TrackballControls( camera, renderer.domElement );
-				controls.minDistance = 500;
-				controls.maxDistance = 6000;
-				controls.addEventListener( 'change', render );
 
 				CreateButtons(targets, transform);
 			}

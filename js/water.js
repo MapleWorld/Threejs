@@ -2,7 +2,7 @@ import { Water } from '../jsm/objects/Water.js';
 import * as THREE from "../build/three.module.js";
 
 export function CreateWater(dirLight) {
-    let waterGeometry = new THREE.PlaneBufferGeometry(2500, 2500);
+    let waterGeometry = new THREE.PlaneBufferGeometry(5000, 5000);
     let water = new Water(
         waterGeometry, {
             textureWidth: 512,
