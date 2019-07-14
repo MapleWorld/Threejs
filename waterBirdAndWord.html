@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>three.js webgl - lights - hemisphere light</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="main.css">
+    <style>
+        body {
+                color: #444;
+            }
+            a {
+                color: #08f;
+            }
+        </style>
+</head>
+
+<body>
+    <div id="container"></div>
+    <script type="x-shader/x-vertex" id="vertexShader">
+        varying vec3 vWorldPosition;
+            void main() {
+                vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+                vWorldPosition = worldPosition.xyz;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+            }
+        </script>
+    <script type="x-shader/x-fragment" id="fragmentShader">
+        uniform vec3 topColor;
+            uniform vec3 bottomColor;
+            uniform float offset;
+            uniform float exponent;
+            varying vec3 vWorldPosition;
+            void main() {
+                float h = normalize( vWorldPosition + offset ).y;
+                gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h , 0.0), exponent ), 0.0 ) ), 1.0 );
+            }
+        </script>
+    <script type="module">
+        //http-server . -c-1 -p 8000
+
+            import * as THREE from './build/three.module.js';
+            import { GUI } from './jsm/libs/dat.gui.module.js';
+            import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+            import { OrbitControls } from './jsm/controls/OrbitControls.js';
+            import { TrackballControls } from './jsm/controls/TrackballControls.js';
+            import { HeartShapeMesh } from './js/heart.js';
+            import { CreateWater } from './js/water.js';
+            import { CreateGround } from './js/ground.js';
+            import { CreateHemisphereLight } from './js/hemisphereLight.js';
+            import { CreateRenderer } from './js/renderer.js';
+            import { Water } from './jsm/objects/Water.js';
+            import { Sky } from './jsm/objects/Sky.js';
+            import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
+
+            const NUMBER_OF_BIRDS = 3000;
+            var mixers = [];
+            var water, camera, dirLight, renderer, controls, hemiLight, light;
+
+            var clock = new THREE.Clock();
+            let scene = new THREE.Scene();
+            init();
+            animate();
+
+            function randomizeObjectPosition(obj) {
+                obj.position.x = 2000 * ( 0.5 - Math.random() );
+                obj.position.y = 300 * ( 0.5 - Math.random() ) + 300;
+                obj.position.z = 1500 * ( 0.5 - Math.random() );
+                obj.rotation.y = 3.14 * ( 0.5 - Math.random() );
+                obj.rotation.x = 3.14 * ( 0.5 - Math.random() );
+                obj.matrixAutoUpdate = false;
+                obj.updateMatrix();
+                return obj;
+            }
+
+            function createBird() {
+                var loader = new GLTFLoader();
+                loader.load( 'models/gltf/Flamingo.glb', function ( gltf ) {
+                    var mesh = gltf.scene.children[ 0 ];
+                    var s = 0.35;
+                    mesh.scale.set( s, s, s );
+                    mesh.position.y = 15;
+                    mesh.rotation.y = 3.45;
+                    mesh.castShadow = true;
+                    mesh.receiveShadow = true;
+                    scene.add( mesh );
+                    var mixer = new THREE.AnimationMixer( mesh );
+                    mixer.clipAction( gltf.animations[ 0 ] ).setDuration( 1 ).play();
+                    mixers.push( mixer );
+                } );
+            }
+
+            function init() {
+                var container = document.getElementById('container');
+                camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 5000 );
+                camera.position.set( 0, 0, 250 );
+                scene.background = new THREE.Color().setHSL( 0.6, 0, 1 );
+
+                dirLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
+                scene.add( dirLight );
+
+
+                water = CreateWater(dirLight);
+                scene.add( water );
+
+                for (let i = 0; i < NUMBER_OF_BIRDS; i ++ ) {
+                    scene.add(randomizeObjectPosition(HeartShapeMesh()));
+                }
+                createBird();
+
+
+                // RENDERER
+                renderer = CreateRenderer(container);
+
+                // Sky
+                var sky = new Sky();
+                var uniforms = sky.material.uniforms;
+
+                var parameters = {
+                    distance: 400,
+                    inclination: 0.49,
+                    azimuth: 0.205
+                };
+                var cubeCamera = new THREE.CubeCamera( 0.1, 1, 512 );
+                cubeCamera.renderTarget.texture.generateMipmaps = true;
+                cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+
+                scene.background = cubeCamera.renderTarget;
+
+                function updateSun() {
+                    var theta = Math.PI * ( parameters.inclination - 0.5 );
+                    var phi = 2 * Math.PI * ( parameters.azimuth - 0.5 );
+                    dirLight.position.x = parameters.distance * Math.cos( phi );
+                    dirLight.position.y = parameters.distance * Math.sin( phi ) * Math.sin( theta );
+                    dirLight.position.z = parameters.distance * Math.sin( phi ) * Math.cos( theta );
+                    sky.material.uniforms[ 'sunPosition' ].value = dirLight.position.copy( dirLight.position );
+                    water.material.uniforms[ 'sunDirection' ].value.copy( dirLight.position ).normalize();
+                    cubeCamera.update( renderer, sky );
+                }
+                updateSun();
+
+                // Controls
+                window.addEventListener( 'resize', onWindowResize, false );
+                controls = new OrbitControls( camera, renderer.domElement );
+                controls.maxPolarAngle = Math.PI * 0.495;   
+                addGUIControlBox(updateSun, parameters);             
+            }
+
+            // GUI
+            function addGUIControlBox(updateFunction, parameters) {
+                var gui = new GUI();
+                var folder = gui.addFolder( 'Sky' );
+                folder.add( parameters, 'inclination', 0, 0.5, 0.0001 ).onChange( updateFunction );
+                folder.add( parameters, 'azimuth', 0, 1, 0.0001 ).onChange( updateFunction );
+                folder.open();
+                var uniforms = water.material.uniforms;
+                var folder = gui.addFolder( 'Water' );
+                folder.add( uniforms.distortionScale, 'value', 0, 8, 0.1 ).name( 'distortionScale' );
+                folder.add( uniforms.size, 'value', 0.1, 10, 0.1 ).name( 'size' );
+                folder.add( uniforms.alpha, 'value', 0.9, 1, .001 ).name( 'alpha' );
+                folder.open();
+            }
+
+            function onWindowResize() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize( window.innerWidth, window.innerHeight );
+            }
+
+            function animate() {
+                requestAnimationFrame( animate );
+                render();
+            }
+
+            function render() {
+                let delta = clock.getDelta();
+                for ( let i = 0; i < mixers.length; i ++ ) {
+                    mixers[i].update( delta );
+                }
+                controls.update( clock.getDelta() );
+                water.material.uniforms[ 'time' ].value += 1.0 / 60.0;
+                renderer.render( scene, camera );
+            }
+
+        </script>
+</body>
+
+</html>
