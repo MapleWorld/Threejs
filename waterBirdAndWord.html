@@ -56,6 +56,7 @@
             import { CreateTable, CreateTargetObject, CreateButtons } from './js/table.js';
             import { RandomizeObjectPosition } from './js/helper.js';
             import { CreateBird } from './js/bird.js';
+            import { LoadPictureObject } from './js/picture.js';
 
             const NUMBER_OF_BIRDS = 300;
             var mixers = [];
@@ -96,12 +97,15 @@
                 var container = document.getElementById('container');
                 camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 500000 );
                 camera.position.set( 0, 500, 5000 );
-                webGLScene.background = new THREE.Color().setHSL( 0.6, 0, 1 );
+                //webGLScene.background = new THREE.Color().setHSL( 0.6, 0, 1 );
 
                 // Objects
                 dirLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
                 water = CreateWater(dirLight);
+                // Image
+                let imageObject = LoadPictureObject('pics/cover.jpg');
 
+                webGLScene.add(imageObject);  
                 webGLScene.add( dirLight );
                 webGLScene.add( water );
 
@@ -119,18 +123,14 @@
                 webGLRenderer = CreateWebGLRenderer();
                 css3DRenderer = CreateCss3DRenderer();
                 container.appendChild(webGLRenderer.domElement);
-                container.appendChild( css3DRenderer.domElement );      
+                container.appendChild(css3DRenderer.domElement);      
 
                 createSkyWithSun();
-                
 
                 // Controls
                 window.addEventListener( 'resize', onWindowResize, false );
                 controls = new TrackballControls( camera );
                 controls.maxPolarAngle = Math.PI * 0.495;   
-
-
-                // Image
             }
 
             function transform( targets, duration ) {

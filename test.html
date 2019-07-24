@@ -17,7 +17,7 @@
 
         import { TrackballControls } from './jsm/controls/TrackballControls.js';
         var scene = new THREE.Scene();
-        var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+        var camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 500000 );
         var renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
@@ -47,6 +47,7 @@
         var map = new THREE.TextureLoader().load( 'pics/cover.jpg' );
         var material = new THREE.SpriteMaterial( { map: map, color: 0xffffff } );
         var sprite = new THREE.Sprite( material );
+        sprite.scale.set(1, 1, 1)
         scene.add( sprite );
         
         var update = function() {
