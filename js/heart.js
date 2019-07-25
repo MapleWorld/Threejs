@@ -8,7 +8,6 @@ import {
 export function HeartShapeMesh() {
     let x = 0, y = 0;
     let heartShape = new Shape();
-
     heartShape.moveTo( x + 5, y + 5 );
     heartShape.bezierCurveTo( x + 5, y + 5, x + 4, y, x, y );
     heartShape.bezierCurveTo( x - 6, y, x - 6, y + 7,x - 6, y + 7 );
@@ -20,3 +19,8 @@ export function HeartShapeMesh() {
     let material = new MeshBasicMaterial( { color: 'hotpink' } );
     return new Mesh( geometry, material ) ;
 };
+
+// Sextic Equation
+export function HeartShape3DEquation(x, y, z) {
+    return (x**2 + ((9/4) * y**2) + z**2 - 1)**3 - (x**2 * z**3) - (9/80)*y**2 * z**3;
+};   

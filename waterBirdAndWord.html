@@ -99,21 +99,25 @@
                 camera.position.set( 0, 500, 5000 );
                 webGLScene.background = new THREE.Color().setHSL( 0.6, 0, 1 );
 
-                // Objects
+                // Environment
                 dirLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
                 water = CreateWater(dirLight);
                 webGLScene.add( dirLight );
                 webGLScene.add( water );
 
+                // Hearts
                 for (let i = 0; i < NUMBER_OF_BIRDS; i ++ ) {
                     webGLScene.add(RandomizeObjectPosition(HeartShapeMesh()));
                 }
+
+                // Birds
+                CreateBird(webGLScene, mixers);
                 CreateBird(webGLScene, mixers);
 
                 // Image
                 let imageObject = LoadPictureObject('pics/cover.jpg');
                 webGLScene.add(imageObject);  
-                
+
                 objects = CreateTable(words);
                 objects.map(obj => css3dScene.add(obj));
                 let targets = CreateTargetObject(words);
