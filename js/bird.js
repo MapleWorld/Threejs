@@ -1,4 +1,4 @@
-import { GetRandomNum } from "./helper.js";
+import { GetRandomNum } from "./utility.js";
 import * as THREE from "../build/three.module.js";
 import { GLTFLoader } from '../jsm/loaders/GLTFLoader.js';
 
@@ -18,8 +18,9 @@ function createBirdMesh(gltf) {
     let birdMesh = gltf.scene.children[ 0 ];
     let s = 0.35;
     birdMesh.scale.set( s, s, s );
-    birdMesh.position.y = 150;
-    birdMesh.rotation.y = 3.45;
+    birdMesh.position.x = GetRandomNum(0, 1000); // Height
+    birdMesh.position.y = GetRandomNum(100, 200); // Height
+    birdMesh.rotation.y = 0;
     birdMesh.castShadow = true;
     birdMesh.receiveShadow = true;
     return birdMesh;

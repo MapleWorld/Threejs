@@ -54,7 +54,7 @@
             import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
             import { words } from './js/words.js';
             import { CreateTable, CreateTargetObject, CreateButtons } from './js/table.js';
-            import { RandomizeObjectPosition } from './js/helper.js';
+            import { RandomizeObjectPosition } from './js/utility.js';
             import { CreateBird } from './js/bird.js';
             import { LoadPictureObject } from './js/picture.js';
 
@@ -102,10 +102,6 @@
                 // Objects
                 dirLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
                 water = CreateWater(dirLight);
-                // Image
-                let imageObject = LoadPictureObject('pics/cover.jpg');
-
-                webGLScene.add(imageObject);  
                 webGLScene.add( dirLight );
                 webGLScene.add( water );
 
@@ -114,6 +110,10 @@
                 }
                 CreateBird(webGLScene, mixers);
 
+                // Image
+                let imageObject = LoadPictureObject('pics/cover.jpg');
+                webGLScene.add(imageObject);  
+                
                 objects = CreateTable(words);
                 objects.map(obj => css3dScene.add(obj));
                 let targets = CreateTargetObject(words);
