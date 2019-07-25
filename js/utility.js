@@ -1,7 +1,7 @@
 export function RandomizeObjectPosition(obj) {
-    obj.position.x = 2000 * ( 0.5 - Math.random() );
-    obj.position.y = 300 * ( 0.5 - Math.random() ) + 300;
-    obj.position.z = 1500 * ( 0.5 - Math.random() );
+    obj.position.x = 10000 * ( 0.5 - Math.random() );
+    obj.position.y = 10000 * ( 0.5 - Math.random() ) + 1000;
+    obj.position.z = 10000 * ( 0.5 - Math.random() );
     obj.rotation.y = 3.14 * ( 0.5 - Math.random() );
     obj.rotation.x = 3.14 * ( 0.5 - Math.random() );
     obj.matrixAutoUpdate = false;

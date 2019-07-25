@@ -25,7 +25,7 @@ export function CreateTable(words) {
 
         var object = new CSS3DObject( element );
         object.position.x = Math.random() * 4000 - 2000;
-        object.position.y = Math.random() * 4000 - 2000;
+        object.position.y = Math.random() * 5000 - 2000;
         object.position.z = Math.random() * 4000 - 2000;
 
         objectList.push( object );
@@ -46,7 +46,7 @@ function createTargetTable(words, targets) {
     for ( var i = 0; i < words.length; i += 5 ) {
         var object = new THREE.Object3D();
         object.position.x = ( words[ i + 3 ] * 140 ) - 1330;
-        object.position.y = - ( words[ i + 4 ] * 180 ) + 990;
+        object.position.y = - ( words[ i + 4 ] * 180 ) + 1000;
         targetTable.push( object );
     }
     return targetTable;

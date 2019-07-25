@@ -17,8 +17,8 @@ function createBirdMesh(gltf, position = 0) {
     const s = 0.35;
     let birdMesh = gltf.scene.children[position];
     birdMesh.scale.set(s, s, s);
-    birdMesh.position.x = GetRandomNum(0, 1000); // Height
-    birdMesh.position.y = GetRandomNum(100, 200); // Height
+    birdMesh.position.x = GetRandomNum(0, 1000); // 
+    birdMesh.position.y = GetRandomNum(500, 1000); // Height
     birdMesh.rotation.y = 0;
     birdMesh.castShadow = true;
     birdMesh.receiveShadow = true;

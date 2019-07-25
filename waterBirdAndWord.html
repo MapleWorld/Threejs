@@ -59,38 +59,36 @@
             import { LoadPictureObject } from './js/picture.js';
 
             const NUMBER_OF_BIRDS = 300;
-            var mixers = [];
-            var water, camera, dirLight, webGLRenderer, css3DRenderer, controls, hemiLight, light;
-            var objects = [];
+            let mixers = [];
+            let water, camera, dirLight, webGLRenderer, css3DRenderer, controls, hemiLight, light;
+            let objects = [];
 
-            var clock = new THREE.Clock();
+            let clock = new THREE.Clock();
             let webGLScene = new THREE.Scene();
             let css3dScene = new THREE.Scene();
             init();
             animate();
 
             function createSkyWithSun() {
-                var sky = new Sky();
-                var uniforms = sky.material.uniforms;
-                var parameters = {
+                let sky = new Sky();
+                let uniforms = sky.material.uniforms;
+                let parameters = {
                     distance: 400,
-                    inclination: 0.49,
+                    inclination: 0.45,
                     azimuth: 0.305
                 };
-                var cubeCamera = new THREE.CubeCamera( 0.1, 1, 512 );
-                cubeCamera.renderTarget.texture.generateMipmaps = true;
-                cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
-
-                webGLScene.background = cubeCamera.renderTarget;
-
-                var theta = Math.PI * ( parameters.inclination - 0.5 );
-                var phi = 2 * Math.PI * ( parameters.azimuth - 0.5 );
+                let theta = Math.PI * ( parameters.inclination - 0.5 );
+                let phi = 2 * Math.PI * ( parameters.azimuth - 0.5 );
                 dirLight.position.x = parameters.distance * Math.cos( phi );
                 dirLight.position.y = parameters.distance * Math.sin( phi ) * Math.sin( theta );
                 dirLight.position.z = parameters.distance * Math.sin( phi ) * Math.cos( theta );
                 sky.material.uniforms[ 'sunPosition' ].value = dirLight.position.copy( dirLight.position );
                 water.material.uniforms[ 'sunDirection' ].value.copy( dirLight.position ).normalize();
+                let cubeCamera = new THREE.CubeCamera( 0.1, 1, 512 );
+                cubeCamera.renderTarget.texture.generateMipmaps = true;
+                cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
                 cubeCamera.update( webGLRenderer, sky );
+                webGLScene.background = cubeCamera.renderTarget;
             }
 
             function init() {
@@ -118,6 +116,7 @@
                 let imageObject = LoadPictureObject('pics/cover.jpg');
                 webGLScene.add(imageObject);  
 
+                // Table & Words
                 objects = CreateTable(words);
                 objects.map(obj => css3dScene.add(obj));
                 let targets = CreateTargetObject(words);
@@ -133,7 +132,8 @@
 
                 // Controls
                 window.addEventListener( 'resize', onWindowResize, false );
-                controls = new TrackballControls( camera );
+                controls = new OrbitControls(camera, css3DRenderer.domElement);
+                //controls = new TrackballControls(camera);
                 controls.maxPolarAngle = Math.PI * 0.495;   
             }
 
