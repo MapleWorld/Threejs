@@ -13,7 +13,6 @@
     <div id="container"></div>
     <div id="menu">
         <button id="table">TABLE</button>
-        <button id="sphere">SPHERE</button>
         <button id="helix">HELIX</button>
         <button id="grid">GRID</button>
     </div>
@@ -44,7 +43,7 @@
             import { GUI } from './jsm/libs/dat.gui.module.js';
             import { OrbitControls } from './jsm/controls/OrbitControls.js';
             import { TrackballControls } from './jsm/controls/TrackballControls.js';
-            import { HeartShapeMesh } from './js/heart.js';
+            import { HeartShapeMesh, CreateHeartShape } from './js/heart.js';
             import { CreateWater } from './js/water.js';
             import { CreateGround } from './js/ground.js';
             import { CreateHemisphereLight } from './js/hemisphereLight.js';
@@ -59,6 +58,7 @@
             import { LoadPictureObject } from './js/picture.js';
 
             const NUMBER_OF_BIRDS = 300;
+            const NUMBER_OF_HEART = 1000;
             let mixers = [];
             let water, camera, dirLight, webGLRenderer, css3DRenderer, controls, hemiLight, light;
             let objects = [];
@@ -104,8 +104,9 @@
                 webGLScene.add( water );
 
                 // Hearts
-                for (let i = 0; i < NUMBER_OF_BIRDS; i ++ ) {
-                    webGLScene.add(RandomizeObjectPosition(HeartShapeMesh()));
+                let heartList = CreateHeartShape(NUMBER_OF_HEART);
+                for (let i = 0; i < heartList.length; i ++ ) {
+                    webGLScene.add(heartList[i]);
                 }
 
                 // Birds
@@ -113,8 +114,16 @@
                 CreateBird(webGLScene, mixers);
 
                 // Image
-                let imageObject = LoadPictureObject('pics/cover.jpg');
-                webGLScene.add(imageObject);  
+                let coverPhoto = LoadPictureObject('pics/cover.jpg');
+                coverPhoto.position.x = 8000;
+                coverPhoto.position.y = 5000;
+                coverPhoto.position.z = -25000;
+                let showerPhoto = LoadPictureObject('pics/shower.jpg');
+                showerPhoto.position.x = 17500;
+                showerPhoto.position.y = 5000;
+                showerPhoto.position.z = -25000;
+                webGLScene.add(coverPhoto);  
+                webGLScene.add(showerPhoto);  
 
                 // Table & Words
                 objects = CreateTable(words);

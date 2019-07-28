@@ -14,14 +14,14 @@ export function CreateBird(scene, mixers) {
 }
 
 function createBirdMesh(gltf, position = 0) {
-    const s = 0.35;
+    const s = 0.50;
     let birdMesh = gltf.scene.children[position];
     birdMesh.scale.set(s, s, s);
-    birdMesh.position.x = GetRandomNum(0, 1000); // 
-    birdMesh.position.y = GetRandomNum(500, 1000); // Height
+    birdMesh.position.x = GetRandomNum(-150, 150); // 
+    birdMesh.position.y = 1100;//GetRandomNum(500, 1000); // Height
     birdMesh.rotation.y = 0;
-    birdMesh.castShadow = true;
-    birdMesh.receiveShadow = true;
+    //birdMesh.castShadow = true;
+    //birdMesh.receiveShadow = true;
     return birdMesh;
 
 }
