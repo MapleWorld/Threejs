@@ -144,6 +144,8 @@
                 controls = new OrbitControls(camera, css3DRenderer.domElement);
                 //controls = new TrackballControls(camera);
                 controls.maxPolarAngle = Math.PI * 0.495;   
+                controls.minDistance = 0;
+                controls.maxDistance = 25000;
             }
 
             function transform( targets, duration ) {
