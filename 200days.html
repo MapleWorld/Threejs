@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>200 Days With Ma Livia</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="./css/main.css">
+    <link type="text/css" rel="stylesheet" href="./css/table.css">
+</head>
+
+<body>
+    <div id="container"></div>
+    <div id="menu">
+        <button id="table">TABLE</button>
+        <button id="sphere">SPHERE</button>
+        <button id="helix">HELIX</button>
+        <button id="grid">GRID</button>
+    </div>
+    <script src="js/libs/tween.min.js"></script>
+    <script type="x-shader/x-vertex" id="vertexShader">
+        varying vec3 vWorldPosition;
+            void main() {
+                vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+                vWorldPosition = worldPosition.xyz;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+            }
+        </script>
+    <script type="x-shader/x-fragment" id="fragmentShader">
+        uniform vec3 topColor;
+            uniform vec3 bottomColor;
+            uniform float offset;
+            uniform float exponent;
+            varying vec3 vWorldPosition;
+            void main() {
+                float h = normalize( vWorldPosition + offset ).y;
+                gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h , 0.0), exponent ), 0.0 ) ), 1.0 );
+            }
+        </script>
+    <script type="module">
+        //http-server . -c-1 -p 8000
+
+            import * as THREE from './build/three.module.js';
+            import { GUI } from './jsm/libs/dat.gui.module.js';
+            import { OrbitControls } from './jsm/controls/OrbitControls.js';
+            import { TrackballControls } from './jsm/controls/TrackballControls.js';
+            import { HeartShapeMesh } from './js/heart.js';
+            import { CreateWater } from './js/water.js';
+            import { CreateGround } from './js/ground.js';
+            import { CreateHemisphereLight } from './js/hemisphereLight.js';
+            import { CreateWebGLRenderer, CreateCss3DRenderer } from './js/renderer.js';
+            import { Water } from './jsm/objects/Water.js';
+            import { Sky } from './jsm/objects/Sky.js';
+            import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
+            import { words } from './js/words.js';
+            import { CreateTable, CreateTargetObject, CreateButtons } from './js/table.js';
+            import { RandomizeObjectPosition } from './js/utility.js';
+            import { CreateBird } from './js/bird.js';
+            import { LoadPictureObject } from './js/picture.js';
+
+            const NUMBER_OF_BIRDS = 300;
+            let mixers = [];
+            let water, camera, dirLight, webGLRenderer, css3DRenderer, controls, hemiLight, light;
+            let objects = [];
+
+            let clock = new THREE.Clock();
+            let webGLScene = new THREE.Scene();
+            let css3dScene = new THREE.Scene();
+            init();
+            animate();
+
+            function createSkyWithSun() {
+                let sky = new Sky();
+                let uniforms = sky.material.uniforms;
+                let parameters = {
+                    distance: 400,
+                    inclination: 0.45,
+                    azimuth: 0.305
+                };
+                let theta = Math.PI * ( parameters.inclination - 0.5 );
+                let phi = 2 * Math.PI * ( parameters.azimuth - 0.5 );
+                dirLight.position.x = parameters.distance * Math.cos( phi );
+                dirLight.position.y = parameters.distance * Math.sin( phi ) * Math.sin( theta );
+                dirLight.position.z = parameters.distance * Math.sin( phi ) * Math.cos( theta );
+                sky.material.uniforms[ 'sunPosition' ].value = dirLight.position.copy( dirLight.position );
+                water.material.uniforms[ 'sunDirection' ].value.copy( dirLight.position ).normalize();
+                let cubeCamera = new THREE.CubeCamera( 0.1, 1, 512 );
+                cubeCamera.renderTarget.texture.generateMipmaps = true;
+                cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+                cubeCamera.update( webGLRenderer, sky );
+                webGLScene.background = cubeCamera.renderTarget;
+            }
+
+            function init() {
+                var container = document.getElementById('container');
+                camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 500000 );
+                camera.position.set( 0, 500, 5000 );
+                webGLScene.background = new THREE.Color().setHSL( 0.6, 0, 1 );
+
+                // Environment
+                dirLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
+                water = CreateWater(dirLight);
+                webGLScene.add( dirLight );
+                webGLScene.add( water );
+
+                // Hearts
+                for (let i = 0; i < NUMBER_OF_BIRDS; i ++ ) {
+                    webGLScene.add(RandomizeObjectPosition(HeartShapeMesh()));
+                }
+
+                // Birds
+                CreateBird(webGLScene, mixers);
+                CreateBird(webGLScene, mixers);
+
+                // Image
+                let imageObject = LoadPictureObject('pics/cover.jpg');
+                webGLScene.add(imageObject);  
+
+                // Table & Words
+                objects = CreateTable(words);
+                objects.map(obj => css3dScene.add(obj));
+                let targets = CreateTargetObject(words);
+                CreateButtons(targets, transform);
+
+                // RENDERER
+                webGLRenderer = CreateWebGLRenderer();
+                css3DRenderer = CreateCss3DRenderer();
+                container.appendChild(webGLRenderer.domElement);
+                container.appendChild(css3DRenderer.domElement);      
+
+                createSkyWithSun();
+
+                // Controls
+                window.addEventListener( 'resize', onWindowResize, false );
+                controls = new OrbitControls(camera, css3DRenderer.domElement);
+                //controls = new TrackballControls(camera);
+                controls.maxPolarAngle = Math.PI * 0.495;   
+            }
+
+            function transform( targets, duration ) {
+                TWEEN.removeAll();
+                for ( var i = 0; i < objects.length; i ++ ) {
+                    var object = objects[ i ];
+                    var target = targets[ i ];
+                    new TWEEN.Tween( object.position )
+                        .to( { x: target.position.x, y: target.position.y, z: target.position.z }, Math.random() * duration + duration )
+                        .easing( TWEEN.Easing.Exponential.InOut )
+                        .start();
+                    new TWEEN.Tween( object.rotation )
+                        .to( { x: target.rotation.x, y: target.rotation.y, z: target.rotation.z }, Math.random() * duration + duration )
+                        .easing( TWEEN.Easing.Exponential.InOut )
+                        .start();
+                }
+                new TWEEN.Tween( this )
+                    .to( {}, duration * 2 )
+                    .onUpdate( render )
+                    .start();
+            }
+
+            function onWindowResize() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                webGLRenderer.setSize( window.innerWidth, window.innerHeight );
+                render();
+            }
+
+            function animate() {
+                requestAnimationFrame( animate );
+                render();
+
+                TWEEN.update();
+                controls.update();
+            }
+
+            function render() {
+                let delta = clock.getDelta();
+                for ( let i = 0; i < mixers.length; i ++ ) {
+                    mixers[i].update( delta );
+                }
+                controls.update( clock.getDelta() );
+                water.material.uniforms[ 'time' ].value += 1.0 / 60.0;
+                webGLRenderer.render( webGLScene, camera );
+                css3DRenderer.render( css3dScene, camera );
+            }
+
+        </script>
+</body>
+
+</html>
