@@ -34,9 +34,8 @@ export function CreateTable(words) {
 }
 
 export function CreateTargetObject(words) {
-    let targets = { table: [], sphere: [], helix: [], grid: [] };
+    let targets = { table: [], helix: [], grid: [] };
     targets.table = createTargetTable(words, targets);
-    targets.sphere = createTargetSphere(words, targets);
     targets.helix = createTargetHelix(words, targets);
     targets.grid = createTargetGrid(words, targets);
     return targets;
@@ -45,26 +44,11 @@ function createTargetTable(words, targets) {
     let targetTable = [];
     for ( var i = 0; i < words.length; i += 5 ) {
         var object = new THREE.Object3D();
-        object.position.x = ( words[ i + 3 ] * 140 ) - 1330;
-        object.position.y = - ( words[ i + 4 ] * 180 ) + 1000;
+        object.position.x = ( words[ i + 3 ] * 140 ) - 850;
+        object.position.y = - ( words[ i + 4 ] * 180 ) + 1750;
         targetTable.push( object );
     }
     return targetTable;
-}
-
-function createTargetSphere(words, targets) {
-    let targetSphere = [];
-    var vector = new THREE.Vector3();
-    for ( var i = 0, l = words.length; i < l; i ++ ) {
-        var phi = Math.acos( - 1 + ( 2 * i ) / l );
-        var theta = Math.sqrt( l * Math.PI ) * phi;
-        var object = new THREE.Object3D();
-        object.position.setFromSphericalCoords( 800, phi, theta );
-        vector.copy( object.position ).multiplyScalar( 2 );
-        object.lookAt( vector );
-        targetSphere.push( object );
-    }
-    return targetSphere;
 }
 
 function createTargetHelix(words, targets) {
@@ -72,10 +56,9 @@ function createTargetHelix(words, targets) {
     var vector = new THREE.Vector3();
     for ( var i = 0, l = words.length; i < l; i ++ ) {
         var theta = i * 0.175 + Math.PI;
-        var y = - ( i * 8 ) + 450;
         var object = new THREE.Object3D();
-        object.position.setFromCylindricalCoords( 900, theta, y );
-        vector.x = object.position.x * 2;
+        object.position.setFromCylindricalCoords( 900, theta + 2000, 1500 );
+        vector.x = object.position.x * 3;
         vector.y = object.position.y;
         vector.z = object.position.z * 2;
         object.lookAt( vector );
@@ -89,7 +72,7 @@ function createTargetGrid(words, targets) {
     for ( var i = 0; i < words.length; i ++ ) {
         var object = new THREE.Object3D();
         object.position.x = ( ( i % 5 ) * 400 ) - 800;
-        object.position.y = ( - ( Math.floor( i / 5 ) % 5 ) * 400 ) + 800;
+        object.position.y = ( - ( Math.floor( i / 5 ) % 5 ) * 400 ) + 1750;
         object.position.z = ( Math.floor( i / 25 ) ) * 1000 - 2000;
         targetGrid.push( object );
     }
@@ -101,11 +84,6 @@ export function CreateButtons(targets, transform) {
     var button = document.getElementById( 'table' );
     button.addEventListener( 'click', () => {
         transform( targets.table, 2000 );
-    }, false );
-
-    var button = document.getElementById( 'sphere' );
-    button.addEventListener( 'click', () => {
-        transform( targets.sphere, 2000 );
     }, false );
 
     var button = document.getElementById( 'helix' );
