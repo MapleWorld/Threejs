@@ -45,7 +45,7 @@ function createTargetTable(words, targets) {
     for ( var i = 0; i < words.length; i += 5 ) {
         var object = new THREE.Object3D();
         object.position.x = ( words[ i + 3 ] * 140 ) - 850;
-        object.position.y = - ( words[ i + 4 ] * 180 ) + 1750;
+        object.position.y = - ( words[ i + 4 ] * 180 ) + 2050;
         targetTable.push( object );
     }
     return targetTable;
